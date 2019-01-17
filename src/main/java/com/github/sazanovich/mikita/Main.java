@@ -14,6 +14,12 @@ public class Main {
 
     public static void main(String[] args) throws Exception {
         Path replayFolder = Paths.get(args[0]);
+        Path observationFolder = Paths.get(args[1]);
+        if (!Files.exists(observationFolder)) {
+            Files.createDirectory(observationFolder);
+        }
+        System.out.println(replayFolder);
+        System.out.println(observationFolder);
         List<Path> replayPaths =
             Files
                 .readAllLines(Paths.get(replayFolder.toString(), "meta.txt"))
@@ -21,7 +27,7 @@ public class Main {
                 .sorted()
                 .map(replayName -> Paths.get(replayFolder.toString(), replayName))
                 .collect(Collectors.toList());
-        Translator translator = new Translator();
+        int totalCnt = 0;
         for (Path replayPath : replayPaths) {
             String stringPath = replayPath.toString();
             System.out.println(stringPath);
@@ -38,19 +44,26 @@ public class Main {
 
             int beginTick = parser.getTickBorders().fst;
             int endTick = parser.getTickBorders().snd;
-            System.out.println("beginTick: " + beginTick + ", endTick: " + endTick);
             assert demStates[beginTick].ourTeam == 2;
 
-            for (int tick = beginTick; tick < endTick; tick++) {
-                if (demActions[tick].actionType == -1) {
-                    continue;
+            String replayFileName = replayPath.getFileName().toString();
+            String obsFileName = replayFileName.substring(0, replayFileName.indexOf('.')) + ".obs";
+            Path outputPath = Paths.get(observationFolder.toString(), obsFileName);
+            System.out.println(outputPath);
+
+            int cnt = 0;
+            try (Translator translator = new Translator(outputPath)) {
+                for (int tick = beginTick; tick < endTick; tick++) {
+                    if (translator.saveStepIfConvertible(demStates[tick], demActions[tick])) {
+                        cnt += 1;
+                    }
                 }
-                try {
-                    translator.saveStep(demStates[tick], demActions[tick]);
-                } catch (RuntimeException e) {
-                    e.printStackTrace();
-                }
+            } catch(Exception e) {
+                e.printStackTrace();
             }
+            System.out.println("Total demo pairs: " + cnt);
+            totalCnt += cnt;
         }
+        System.out.println("Overall, we have " + totalCnt + " demo pairs");
     }
 }

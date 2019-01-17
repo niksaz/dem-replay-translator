@@ -197,7 +197,7 @@ public class Util {
      * @param states states where all states are (including this and previous)
      */
     public static void stateClosure(int tick, DEMState[] states) {
-        //states[tick].time = tick;
+        states[tick].time = tick;
 
         if (states[tick].ourScore == 0) {
             states[tick].ourScore = states[tick - 1].ourScore;
@@ -287,6 +287,7 @@ public class Util {
             states[tick].enemyTowerHp = states[tick - 1].enemyTowerHp;
             states[tick].enemyTowerX = states[tick - 1].enemyTowerX;
             states[tick].enemyTowerY = states[tick - 1].enemyTowerY;
+            states[tick].isEnemyTowerVisible = states[tick - 1].isEnemyTowerVisible;
         }
     }
 
@@ -346,18 +347,14 @@ public class Util {
                                      Map<Integer, DEMState.CreepState> enemyCreeps,
                                      Map<Integer, DEMState.CreepState> ourCreeps) {
         switch (actions[tick].actionType) {
-            case 0:
             case -1:
-                actions[tick].actionType = 0;
-                //actions[tick].nx -= states[tick].ourX;
-                //actions[tick].ny -= states[tick].ourY;
-                /*actions[tick].nx = states[tick].ourX - states[tick - 1].ourX;
-                actions[tick].ny = states[tick].ourY - states[tick - 1].ourY;*/
-
-                if (actions[tick].nx == 0 && actions[tick].ny == 0) {
+                assert actions[tick].nx == 0 && actions[tick].ny == 0;
+                break;
+            case 0:
+                if (actions[tick].nx == states[tick].ourX && actions[tick].ny == states[tick].ourY) {
+                    // We are moving to our current location -> doing nothing.
                     actions[tick].actionType = -1;
                 }
-
                 break;
             case 2:
                 ArrayList<Integer> listEnemy = new ArrayList<>(enemyCreeps.keySet());
@@ -397,37 +394,5 @@ public class Util {
                         break;
                 }
         }
-    }
-
-    /**
-     * Very util function to compare two close states from the same batch.
-     * @param s1 state1
-     * @param s2 state2
-     * @return if states are identical
-     */
-    public static boolean areStatesClose(DEMState s1, DEMState s2) {
-        return s1.ourScore == s2.ourScore && s1.enemyScore == s2.enemyScore &&
-                s1.ourX == s2.ourX && s1.ourY == s2.ourY &&
-                abs(s1.ourFacing - s2.ourFacing) < 0.01 &&
-                s1.ourLvl == s2.ourLvl && s1.ourAttackDamage == s2.ourAttackDamage &&
-                s1.ourGold == s2.ourGold && s1.ourHp == s2.ourHp && s1.ourMana == s2.ourMana &&
-                s1.ourMaxHp == s2.ourMaxHp && s1.ourMaxMana == s2.ourMaxMana && 
-                s1.isOurAbility1Available == s2.isOurAbility1Available &&
-                s1.isOurAbility2Available == s2.isOurAbility2Available &&
-                s1.isOurAbility3Available == s2.isOurAbility3Available &&
-                s1.isOurAbility4Available == s2.isOurAbility4Available && 
-                s1.isEnemyVisible == s2.isEnemyVisible &&
-                s1.enemyX == s2.enemyX && s1.enemyY == s2.enemyY &&
-                abs(s1.enemyFacing - s2.enemyFacing) < 0.01 &&
-                s1.enemyLvl == s2.enemyLvl && s1.enemyAttackDamage == s2.enemyAttackDamage &&
-                s1.enemyHp == s2.enemyHp && s1.enemyMana == s2.enemyMana &&
-                s1.enemyMaxHp == s2.enemyMaxHp && s1.enemyMaxMana == s2.enemyMaxMana &&
-                s1.recentlyHitCreep == s2.recentlyHitCreep &&
-                s1.recentlyKilledCreep == s2.recentlyKilledCreep &&
-                s1.recentlyHitHero == s2.recentlyHitHero &&
-                s1.recentlyKilledHero == s2.recentlyKilledHero &&
-                s1.ourCreeps.equals(s2.ourCreeps) &&
-                s1.enemyCreeps.equals(s2.enemyCreeps) &&
-                s1.ourTowerHp == s2.ourTowerHp && s1.enemyTowerHp == s2.enemyTowerHp;
     }
 }

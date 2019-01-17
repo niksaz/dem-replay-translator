@@ -6,8 +6,8 @@ import java.util.Arrays;
 
 class RLState {
 
-  private static final float MAX_ABS_X = 1; //8288.0f;
-  private static final float MAX_ABS_Y = 1; //8288.0f;
+  private static final float MAX_ABS_X = 8288.0f;
+  private static final float MAX_ABS_Y = 8288.0f;
   private static final int TOTAL_DIRS = 8;
   private static final int NEARBY_RADIUS = 1600;
 
@@ -34,16 +34,33 @@ class RLState {
     // Update info about the nearest enemy creep, if it is present
     if (!demState.enemyCreeps.isEmpty()) {
       CreepState creepState = demState.enemyCreeps.get(0);
+      assert creepState.isVisible;
       float creepDst = Util.getDistance(demState.ourX, demState.ourY, creepState.x, creepState.y);
       creepDst /= NEARBY_RADIUS;
-      enemy_info[0] = 0;
-      enemy_info[1] = creepDst;
+      if (creepDst < 1.0) {
+        enemy_info[0] = 0;
+        enemy_info[1] = creepDst;
+      }
     }
     // Info about the nearest enemy hero
-    enemy_info[2] = 1;
-    enemy_info[3] = 1;
+    if (demState.isEnemyVisible) {
+      float enemyDst =
+          Util.getDistance(demState.ourX, demState.ourY, demState.enemyX, demState.enemyY);
+      enemyDst /= NEARBY_RADIUS;
+      if (enemyDst < 1.0) {
+        enemy_info[2] = 0;
+        enemy_info[3] = enemyDst;
+      }
+    }
     // Info about the nearest enemy tower
-    enemy_info[4] = 1;
-    enemy_info[5] = 1;
+    if (demState.isEnemyTowerVisible) {
+      float towerDst =
+          Util.getDistance(demState.ourX, demState.ourY, demState.enemyTowerX, demState.enemyTowerY);
+      towerDst /= NEARBY_RADIUS;
+      if (towerDst < 1.0) {
+        enemy_info[4] = 0;
+        enemy_info[5] = towerDst;
+      }
+    }
   }
 }

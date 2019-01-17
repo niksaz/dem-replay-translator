@@ -152,7 +152,7 @@ public class DEMState {
         public int y;
 
         /** Flag detecting if this creep is visible by other team. Useful only for enemy creeps. */
-        public boolean isVisible = false;
+        public boolean isVisible;
 
         /** Creates empty state. */
         public CreepState() {
@@ -161,6 +161,7 @@ public class DEMState {
             hp = -1;
             maxHp = -1;
             type = -1;
+            isVisible = false;
         }
 
         public CreepState(CreepState s) {
@@ -169,6 +170,7 @@ public class DEMState {
             hp = s.hp;
             maxHp = s.maxHp;
             type = s.type;
+            isVisible = s.isVisible;
         }
     }
 
@@ -189,7 +191,7 @@ public class DEMState {
     public int enemyTowerHp;
     public int enemyTowerX;
     public int enemyTowerY;
-
+    public boolean isEnemyTowerVisible;
 
     /**
      * Prints all available data of the state.

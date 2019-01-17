@@ -139,6 +139,8 @@ public class Parser {
                 states[tick].enemyTowerHp = e.getProperty(Constants.HP);
                 states[tick].enemyTowerX = Util.getCoordFromEntity(e).fst;
                 states[tick].enemyTowerY = Util.getCoordFromEntity(e).snd;
+                states[tick].isEnemyTowerVisible  = ((Integer) e.getProperty(Constants.VISIBILITY) & (1 << winnerTeam)) != 0;
+
                 break;
 
             case OUR_TEAM:
@@ -318,22 +320,5 @@ public class Parser {
 
     public void run() throws Exception {
         new SimpleRunner(new MappedFileSource(replayFile)).runWith(this);
-
-        for (int i = beginTick; i < endTick; i++) {
-            states[i].time = i;
-        }
-
-        /*
-        // Now it's time to delete close states-actions.
-        int lastIndTick = beginTick;
-        for (int i = beginTick + 2; i < endTick; i += 2) {
-            if (!Util.areStatesClose(states[i], states[lastIndTick])
-                    || actions[i].actionType != -1
-                    || actions[i].actionType == -1 && actions[lastIndTick].actionType != -1) {
-                states[i].time = i;
-                lastIndTick = i;
-            }
-        }
-        */
     }
 }
