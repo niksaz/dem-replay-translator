@@ -15,6 +15,7 @@ public class Main {
     public static void main(String[] args) throws Exception {
         Path replayFolder = Paths.get(args[0]);
         Path observationFolder = Paths.get(args[1]);
+        Path clientInfoFolder = Paths.get(args[2]);
         if (!Files.exists(observationFolder)) {
             Files.createDirectory(observationFolder);
         }
@@ -48,11 +49,13 @@ public class Main {
 
             String replayFileName = replayPath.getFileName().toString();
             String obsFileName = replayFileName.substring(0, replayFileName.indexOf('.')) + ".obs";
+            Path clientPath = Paths.get(clientInfoFolder.toString(), obsFileName);
             Path outputPath = Paths.get(observationFolder.toString(), obsFileName);
+            System.out.println(clientPath);
             System.out.println(outputPath);
 
             int cnt = 0;
-            try (Translator translator = new Translator(outputPath)) {
+            try (Translator translator = new Translator(clientPath, outputPath)) {
                 for (int tick = beginTick; tick < endTick; tick++) {
                     if (translator.saveStepIfConvertible(demStates[tick], demActions[tick])) {
                         cnt += 1;

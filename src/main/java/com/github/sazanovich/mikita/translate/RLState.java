@@ -14,7 +14,7 @@ class RLState {
   private final float[] hero_info;
   private final float[] enemy_info;
 
-  RLState(DEMState demState) {
+  RLState(DEMState demState, int[] movesForbiddenInDir) {
     float coorX = demState.ourX / MAX_ABS_X;
     float coorY = demState.ourY / MAX_ABS_Y;
     assert demState.ourMaxHp != 0;
@@ -23,9 +23,8 @@ class RLState {
     hero_info = new float[11];
     hero_info[0] = coorX;
     hero_info[1] = coorY;
-    // TODO: Ask the Dota 2 client these questions
     for (int i = 0; i < TOTAL_DIRS; i++) {
-      hero_info[2 + i] = 1;
+      hero_info[2 + i] = movesForbiddenInDir[i];
     }
     hero_info[10] = hp;
 
