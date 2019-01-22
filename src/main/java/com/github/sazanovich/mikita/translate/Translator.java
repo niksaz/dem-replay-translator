@@ -57,7 +57,7 @@ public class Translator implements AutoCloseable {
 
   static int[] parseNumpyIntArray(String stringRepr) {
     stringRepr = stringRepr.substring(1, stringRepr.length() - 1);
-    String[] parts = stringRepr.split(",");
+    String[] parts = stringRepr.split("\\s+");
     int[] result = new int[parts.length];
     for (int i = 0; i < parts.length; i++) {
       result[i] = Integer.parseInt(parts[i]);
